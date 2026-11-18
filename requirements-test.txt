@@ -1,0 +1,2 @@
+# Test-only dependencies for model testing UI (DO NOT include in production requirements.txt)
+streamlit>=1.30.0

@@ -1,0 +1,127 @@
+{
+  "model_name": "RandomForestClassifier",
+  "model_file": "random_forest_8fitur.joblib",
+  "scikit_learn_version": "1.9.1",
+  "trained_at_utc": "2026-11-18T07:44:12.037176+00:00",
+  "random_state": 42,
+  "features": {
+    "count": 8,
+    "order": [
+      "attendance_frequency_7d",
+      "missed_session_count_7d",
+      "reschedule_frequency_7d",
+      "remaining_package_sessions",
+      "days_until_package_expiry",
+      "days_since_last_visit",
+      "reminder_count_7d",
+      "reminder_response_count_7d"
+    ],
+    "importances": {
+      "remaining_package_sessions": 0.3416,
+      "days_until_package_expiry": 0.2636,
+      "attendance_frequency_7d": 0.1348,
+      "days_since_last_visit": 0.1307,
+      "reschedule_frequency_7d": 0.0395,
+      "reminder_count_7d": 0.0348,
+      "missed_session_count_7d": 0.0345,
+      "reminder_response_count_7d": 0.0206
+    }
+  },
+  "label_mapping": {
+    "0": "Active",
+    "1": "At Risk",
+    "2": "Need Attention"
+  },
+  "dataset": {
+    "total_rows": 6229,
+    "train_rows": 4360,
+    "test_rows": 1869,
+    "test_size": 0.3
+  },
+  "evaluation": {
+    "random_forest": {
+      "test_accuracy": 0.7613697164258962,
+      "cv_5fold": {
+        "scores": [
+          0.7584,
+          0.7689,
+          0.76,
+          0.7753,
+          0.7558
+        ],
+        "mean": 0.7637,
+        "std": 0.0073
+      },
+      "classification_report": {
+        "Active": {
+          "precision": 0.6030664395229983,
+          "recall": 0.6941176470588235,
+          "f1-score": 0.6453965360072926,
+          "support": 510.0
+        },
+        "At Risk": {
+          "precision": 0.7235772357723578,
+          "recall": 0.6631892697466468,
+          "f1-score": 0.6920684292379471,
+          "support": 671.0
+        },
+        "Need Attention": {
+          "precision": 0.9355322338830585,
+          "recall": 0.9069767441860465,
+          "f1-score": 0.9210332103321033,
+          "support": 688.0
+        },
+        "accuracy": 0.7613697164258962,
+        "macro avg": {
+          "precision": 0.7540586363928048,
+          "recall": 0.7547612203305056,
+          "f1-score": 0.7528327251924477,
+          "support": 1869.0
+        },
+        "weighted avg": {
+          "precision": 0.7687160975235556,
+          "recall": 0.7613697164258962,
+          "f1-score": 0.763617441461139,
+          "support": 1869.0
+        }
+      }
+    },
+    "decision_tree": {
+      "test_accuracy": 0.729266987693954,
+      "classification_report": {
+        "Active": {
+          "precision": 0.5975855130784709,
+          "recall": 0.5823529411764706,
+          "f1-score": 0.5898709036742801,
+          "support": 510.0
+        },
+        "At Risk": {
+          "precision": 0.669150521609538,
+          "recall": 0.669150521609538,
+          "f1-score": 0.669150521609538,
+          "support": 671.0
+        },
+        "Need Attention": {
+          "precision": 0.8801711840228246,
+          "recall": 0.8968023255813954,
+          "f1-score": 0.8884089272858171,
+          "support": 688.0
+        },
+        "accuracy": 0.729266987693954,
+        "macro avg": {
+          "precision": 0.7156357395702777,
+          "recall": 0.7161019294558013,
+          "f1-score": 0.7158101175232118,
+          "support": 1869.0
+        },
+        "weighted avg": {
+          "precision": 0.7273014372807509,
+          "recall": 0.729266987693954,
+          "f1-score": 0.7282287334652354,
+          "support": 1869.0
+        }
+      }
+    }
+  },
+  "methodology_limitation_warning": "Target labels originate from unsupervised K-Means clustering on the same dataset. Classifier metrics reflect boundary learning fidelity of K-Means partitions rather than empirically observed ground-truth customer churn."
+}

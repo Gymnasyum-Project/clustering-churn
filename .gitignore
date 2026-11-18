@@ -1,0 +1,34 @@
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Sensitive environment configuration
+.env
+.env.local
+*.env
+
+# Large model artifacts (retain metadata, ignore heavy binaries)
+models/*.joblib
+*.joblib
+*.h5
+# Exception: required model artifact for deployment (< 100MB)
+!models/random_forest_8fitur.joblib
+
+# OS & editor artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+__MACOSX/
+gymnasium-classification/
+Percobaan*3/
