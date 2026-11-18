@@ -1,0 +1,144 @@
+{
+  "model_name": "RandomForestClassifier",
+  "model_file": "random_forest_8fitur_v3.joblib",
+  "scikit_learn_version": "1.9.1",
+  "trained_at_utc": "2026-11-18T11:57:00.406406+00:00",
+  "random_state": 42,
+  "features": {
+    "count": 8,
+    "order": [
+      "attendance_frequency_7d",
+      "missed_session_count_7d",
+      "reschedule_frequency_7d",
+      "remaining_package_sessions",
+      "days_until_package_expiry",
+      "days_since_last_visit",
+      "reminder_count_7d",
+      "reminder_response_count_7d"
+    ],
+    "importances": {
+      "remaining_package_sessions": 0.2345,
+      "days_until_package_expiry": 0.2088,
+      "reminder_count_7d": 0.1621,
+      "missed_session_count_7d": 0.136,
+      "days_since_last_visit": 0.0934,
+      "attendance_frequency_7d": 0.0916,
+      "reminder_response_count_7d": 0.057,
+      "reschedule_frequency_7d": 0.0167
+    }
+  },
+  "label_mapping": {
+    "0": "Active",
+    "1": "At Risk",
+    "2": "Need Attention"
+  },
+  "dataset": {
+    "total_rows": 6229,
+    "train_rows": 4360,
+    "test_rows": 1869,
+    "test_size": 0.3
+  },
+  "evaluation": {
+    "random_forest": {
+      "test_accuracy": 0.9732477260567148,
+      "cv_5fold": {
+        "scores": [
+          0.9687,
+          0.9799,
+          0.9647,
+          0.9719,
+          0.9751
+        ],
+        "mean": 0.9721,
+        "std": 0.0052
+      },
+      "classification_report": {
+        "Active": {
+          "precision": 0.9814814814814815,
+          "recall": 0.9839108910891089,
+          "f1-score": 0.9826946847960445,
+          "support": 808.0
+        },
+        "At Risk": {
+          "precision": 0.9611307420494699,
+          "recall": 0.9784172661870504,
+          "f1-score": 0.9696969696969697,
+          "support": 556.0
+        },
+        "Need Attention": {
+          "precision": 0.973630831643002,
+          "recall": 0.9504950495049505,
+          "f1-score": 0.9619238476953907,
+          "support": 505.0
+        },
+        "accuracy": 0.9732477260567148,
+        "macro avg": {
+          "precision": 0.9720810183913179,
+          "recall": 0.9709410689270367,
+          "f1-score": 0.9714385007294682,
+          "support": 1869.0
+        },
+        "weighted avg": {
+          "precision": 0.9733062063115349,
+          "recall": 0.9732477260567148,
+          "f1-score": 0.9732158178453139,
+          "support": 1869.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          795,
+          8,
+          5
+        ],
+        [
+          4,
+          544,
+          8
+        ],
+        [
+          11,
+          14,
+          480
+        ]
+      ]
+    },
+    "decision_tree": {
+      "test_accuracy": 0.9545211342964152,
+      "classification_report": {
+        "Active": {
+          "precision": 0.9665841584158416,
+          "recall": 0.9665841584158416,
+          "f1-score": 0.9665841584158416,
+          "support": 808.0
+        },
+        "At Risk": {
+          "precision": 0.9532374100719424,
+          "recall": 0.9532374100719424,
+          "f1-score": 0.9532374100719424,
+          "support": 556.0
+        },
+        "Need Attention": {
+          "precision": 0.9366336633663367,
+          "recall": 0.9366336633663367,
+          "f1-score": 0.9366336633663367,
+          "support": 505.0
+        },
+        "accuracy": 0.9545211342964152,
+        "macro avg": {
+          "precision": 0.9521517439513736,
+          "recall": 0.9521517439513736,
+          "f1-score": 0.9521517439513736,
+          "support": 1869.0
+        },
+        "weighted avg": {
+          "precision": 0.9545211342964152,
+          "recall": 0.9545211342964152,
+          "f1-score": 0.9545211342964152,
+          "support": 1869.0
+        }
+      }
+    }
+  },
+  "methodology_limitation_warning": "Target labels originate from unsupervised K-Means clustering on the same dataset. Classifier metrics reflect boundary learning fidelity of K-Means partitions rather than empirically observed ground-truth customer churn."
+}

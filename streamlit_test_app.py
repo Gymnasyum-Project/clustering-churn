@@ -126,10 +126,10 @@ st.markdown(
 st.markdown(
     """
     <div class="info-badge-bar">
-        <span class="meta-chip">🤖 Model: Random Forest (100 Estimators)</span>
-        <span class="meta-chip">🎯 Akurasi Uji: 76.14% (8 Fitur Backend)</span>
-        <span class="meta-chip">🔄 5-Fold CV: 76.37% (±0.73%)</span>
-        <span class="meta-chip">🏷️ Target: K-Means Clustering (Silhouette 0.19 — Weak)</span>
+        <span class="meta-chip">🤖 Model: Random Forest v3 (100 Estimators)</span>
+        <span class="meta-chip">🎯 Akurasi Uji: 97.32% (8 Fitur Backend)</span>
+        <span class="meta-chip">🔄 5-Fold CV: 97.21% (±0.52%)</span>
+        <span class="meta-chip">🏷️ Target: K-Means 8-Fitur (Tanpa Aturan Manual)</span>
     </div>
     """,
     unsafe_allow_html=True,
@@ -150,9 +150,9 @@ PRESETS: Dict[str, Dict[str, object]] = {
             "reminder_response_count_7d": 0.0,
         },
     },
-    "CUST00005 (Active)": {
-        "true_label": "Active",
-        "true_code": 0,
+    "CUST00005 (At Risk)": {
+        "true_label": "At Risk",
+        "true_code": 1,
         "values": {
             "attendance_frequency_7d": 0.0,
             "missed_session_count_7d": 1.0,
@@ -164,9 +164,9 @@ PRESETS: Dict[str, Dict[str, object]] = {
             "reminder_response_count_7d": 0.0,
         },
     },
-    "CUST00009 (At Risk)": {
-        "true_label": "At Risk",
-        "true_code": 1,
+    "CUST00009 (Need Attention)": {
+        "true_label": "Need Attention",
+        "true_code": 2,
         "values": {
             "attendance_frequency_7d": 4.0,
             "missed_session_count_7d": 0.0,

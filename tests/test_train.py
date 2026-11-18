@@ -17,14 +17,22 @@ def models_dir():
 
 @pytest.fixture(scope="module")
 def model_path(models_dir):
-    """Returns the path to the trained Random Forest model."""
-    return models_dir / "random_forest_8fitur.joblib"
+    """Returns the path to the trained Random Forest model (v3 default, fallback v2/v1)."""
+    v3 = models_dir / "random_forest_8fitur_v3.joblib"
+    if v3.is_file():
+        return v3
+    v2 = models_dir / "random_forest_8fitur_v2.joblib"
+    return v2 if v2.is_file() else models_dir / "random_forest_8fitur.joblib"
 
 
 @pytest.fixture(scope="module")
 def meta_path(models_dir):
-    """Returns the path to the model metadata JSON."""
-    return models_dir / "model_meta.json"
+    """Returns the path to the model metadata JSON (v3 default, fallback v2/v1)."""
+    v3 = models_dir / "model_meta_v3.json"
+    if v3.is_file():
+        return v3
+    v2 = models_dir / "model_meta_v2.json"
+    return v2 if v2.is_file() else models_dir / "model_meta.json"
 
 
 def test_model_artifact_exists_and_loads(model_path):

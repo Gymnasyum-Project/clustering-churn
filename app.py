@@ -29,7 +29,7 @@ load_dotenv()
 
 HOST: str = os.getenv("HOST", "127.0.0.1")
 PORT: int = int(os.getenv("PORT", "8000"))
-MODEL_PATH: str = os.getenv("MODEL_PATH", "models/random_forest_8fitur.joblib")
+MODEL_PATH: str = os.getenv("MODEL_PATH", "models/random_forest_8fitur_v3.joblib")
 LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
 
 # Setup logging

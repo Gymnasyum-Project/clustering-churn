@@ -28,7 +28,7 @@ import numpy as np
 import pandas as pd
 import sklearn
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -84,10 +84,12 @@ def load_dataset(csv_path: Path) -> Tuple[pd.DataFrame, pd.Series]:
 
 
 def train_and_evaluate(
-    input_csv: str = "data_clustering_inverse.csv",
+    input_csv: str = "data_clustering_kmeans8.csv",
     models_dir: Path | None = None,
     random_state: int = 42,
     test_size: float = 0.3,
+    model_filename: str = "random_forest_8fitur_v3.joblib",
+    meta_filename: str = "model_meta_v3.json",
 ) -> Dict[str, Any]:
     """Executes the training pipeline, comparisons, and serialization."""
     base_dir = Path(__file__).resolve().parent
@@ -155,8 +157,13 @@ def train_and_evaluate(
     for feat, imp in sorted_importances.items():
         print(f"  - {feat}: {imp:.4f}")
 
+    # Confusion Matrix
+    cm_rf = confusion_matrix(y_test, y_pred_rf).tolist()
+    print("\n[Train] Random Forest Confusion Matrix:")
+    print(np.array(cm_rf))
+
     # 4. Save Final Model (.joblib)
-    model_save_path = mod_dir / "random_forest_8fitur.joblib"
+    model_save_path = mod_dir / model_filename
     joblib.dump(rf_model, model_save_path)
     print(f"\n[Train] Saved Random Forest model: {model_save_path}")
 
@@ -188,6 +195,7 @@ def train_and_evaluate(
                     "std": round(cv_std, 4),
                 },
                 "classification_report": rf_report,
+                "confusion_matrix": cm_rf,
             },
             "decision_tree": {
                 "test_accuracy": dt_acc,
@@ -201,7 +209,7 @@ def train_and_evaluate(
         ),
     }
 
-    meta_save_path = mod_dir / "model_meta.json"
+    meta_save_path = mod_dir / meta_filename
     with open(meta_save_path, "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
     print(f"[Train] Saved Model Metadata: {meta_save_path}")

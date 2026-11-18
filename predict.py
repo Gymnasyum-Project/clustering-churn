@@ -8,11 +8,15 @@ Provides core model loading and prediction functions:
 """
 
 import json
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Sequence, Tuple, Union
+from dotenv import load_dotenv
 import joblib
 import numpy as np
 import pandas as pd
+
+load_dotenv()
 
 FEATURE_COLUMNS: List[str] = [
     "attendance_frequency_7d",
@@ -35,10 +39,27 @@ _MODEL_CACHE: Dict[str, Any] = {}
 
 
 def get_default_model_paths() -> Tuple[Path, Path]:
-    """Resolves default model and metadata paths."""
+    """Resolves default model and metadata paths from config or v3 defaults."""
     base_dir = Path(__file__).resolve().parent
-    model_path = base_dir / "models" / "random_forest_8fitur.joblib"
-    meta_path = base_dir / "models" / "model_meta.json"
+    env_model = os.getenv("MODEL_PATH")
+    if env_model:
+        model_path = Path(env_model)
+        if not model_path.is_absolute():
+            model_path = base_dir / model_path
+    else:
+        v3_path = base_dir / "models" / "random_forest_8fitur_v3.joblib"
+        if v3_path.is_file():
+            model_path = v3_path
+        else:
+            model_path = base_dir / "models" / "random_forest_8fitur.joblib"
+
+    if "_v3" in model_path.name:
+        meta_path = model_path.parent / "model_meta_v3.json"
+    elif "_v2" in model_path.name:
+        meta_path = model_path.parent / "model_meta_v2.json"
+    else:
+        meta_path = model_path.parent / "model_meta.json"
+
     return model_path, meta_path
 
 
@@ -72,95 +93,47 @@ def load_model(
 
 def extract_top_factors(
     features: Dict[str, float],
-    predicted_label: str,
+    predicted_label: str = "",
     feature_importances: Dict[str, float] | None = None,
+    max_factors: int = 3,
 ) -> List[str]:
-    """Generates transparent, domain-grounded top factors explaining the prediction.
+    """Generates top factors explaining prediction directly from trained model feature importances.
     
-    Uses domain heuristics aligned with customer retention risk factors:
-    - Attendance volume and frequency
-    - Days since last gym visit
-    - Package expiry proximity and remaining sessions
-    - Missed/rescheduled sessions and reminder engagement
-    Falls back to feature importance ordering if no specific threshold triggers.
+    Strictly learned and data-driven: ranks features by model importance and formats
+    the customer's actual input values in natural Indonesian sentences.
     """
+    sentence_templates = {
+        "remaining_package_sessions": "Sisa sesi paket: {v} sesi",
+        "days_until_package_expiry": "Masa aktif paket: {v} hari tersisa",
+        "attendance_frequency_7d": "Frekuensi kehadiran 7 hari: {v} sesi",
+        "days_since_last_visit": "Kunjungan terakhir: {v} hari yang lalu",
+        "missed_session_count_7d": "Sesi terlewat dalam 7 hari: {v} sesi",
+        "reschedule_frequency_7d": "Frekuensi reschedule 7 hari: {v} kali",
+        "reminder_count_7d": "Notifikasi pengingat terkirim: {v} pesan",
+        "reminder_response_count_7d": "Respons pengingat 7 hari: {v} kali",
+    }
+
+    importances = feature_importances or {
+        "remaining_package_sessions": 0.2345,
+        "days_until_package_expiry": 0.2088,
+        "reminder_count_7d": 0.1621,
+        "missed_session_count_7d": 0.1360,
+        "days_since_last_visit": 0.0934,
+        "attendance_frequency_7d": 0.0916,
+        "reminder_response_count_7d": 0.0570,
+        "reschedule_frequency_7d": 0.0167,
+    }
+
+    sorted_features = sorted(importances.items(), key=lambda item: item[1], reverse=True)
     factors: List[str] = []
-    att = features.get("attendance_frequency_7d", 0.0)
-    missed = features.get("missed_session_count_7d", 0.0)
-    resched = features.get("reschedule_frequency_7d", 0.0)
-    rem_sess = features.get("remaining_package_sessions", 0.0)
-    days_expiry = features.get("days_until_package_expiry", 0.0)
-    days_last_visit = features.get("days_since_last_visit", 0.0)
-    rem_count = features.get("reminder_count_7d", 0.0)
-    rem_resp = features.get("reminder_response_count_7d", 0.0)
-
-    if predicted_label == "Active":
-        if att >= 2:
-            factors.append(f"Frekuensi kehadiran 7 hari tinggi ({int(att)} sesi)")
-        if days_last_visit <= 3:
-            factors.append(f"Baru saja berkunjung ({int(days_last_visit)} hari lalu)")
-        if missed == 0:
-            factors.append("Tidak ada sesi yang terlewat dalam 7 hari terakhir")
-        if rem_sess >= 6:
-            factors.append(f"Sisa sesi paket masih mencukupi ({int(rem_sess)} sesi)")
-        if days_expiry >= 20:
-            factors.append(f"Masa aktif paket masih panjang ({int(days_expiry)} hari)")
-
-    elif predicted_label == "At Risk":
-        if att == 0:
-            factors.append("Tidak ada kehadiran dalam 7 hari terakhir (0 sesi)")
-        elif att <= 1:
-            factors.append(f"Kehadiran sangat rendah ({int(att)} sesi dalam 7 hari)")
-        elif att >= 3:
-            factors.append(f"Frekuensi kehadiran tercatat {int(att)} sesi dalam 7 hari")
-        if days_last_visit >= 7:
-            factors.append(f"Sudah lama tidak berkunjung ({int(days_last_visit)} hari)")
-        if days_expiry <= 14:
-            factors.append(f"Masa berlaku paket hampir habis ({int(days_expiry)} hari tersisa)")
-        elif days_expiry >= 30:
-            factors.append(f"Masa berlaku paket aktif tersisa {int(days_expiry)} hari")
-        if rem_sess <= 3:
-            factors.append(f"Sisa sesi paket menipis ({int(rem_sess)} sesi)")
-        elif rem_sess >= 7:
-            factors.append(f"Sisa sesi paket keanggotaan ({int(rem_sess)} sesi)")
-        if resched >= 1:
-            factors.append(f"Frekuensi reschedule cukup sering ({int(resched)} kali dalam 7 hari)")
-        if rem_count >= 1 and rem_resp == 0:
-            factors.append(f"Tidak merespons {int(rem_count)} pesan pengingat")
-
-    elif predicted_label == "Need Attention":
-        if missed >= 1:
-            factors.append(f"Terdapat sesi terlewat ({int(missed)} sesi dalam 7 hari)")
-        if resched >= 1:
-            factors.append(f"Frekuensi reschedule tinggi ({int(resched)} kali dalam 7 hari)")
-        if att <= 1:
-            factors.append(f"Kehadiran mingguan rendah ({int(att)} sesi)")
-        if days_last_visit >= 5:
-            factors.append(f"Jarak kunjungan terakhir cukup lama ({int(days_last_visit)} hari)")
-        if rem_count >= 1 and rem_resp == 0:
-            factors.append("Belum merespons pengingat terbaru")
-
-    # Fallback to feature importance ordering formatted as natural Indonesian sentences
-    if len(factors) < 2 and feature_importances:
-        sentence_templates = {
-            "remaining_package_sessions": "Sisa sesi paket: {v} sesi",
-            "days_until_package_expiry": "Masa aktif paket: {v} hari tersisa",
-            "attendance_frequency_7d": "Frekuensi kehadiran 7 hari: {v} sesi",
-            "days_since_last_visit": "Kunjungan terakhir: {v} hari yang lalu",
-            "reschedule_frequency_7d": "Frekuensi reschedule 7 hari: {v} kali",
-            "missed_session_count_7d": "Sesi terlewat dalam 7 hari: {v} sesi",
-            "reminder_count_7d": "Notifikasi pengingat terkirim: {v} pesan",
-            "reminder_response_count_7d": "Respons pengingat 7 hari: {v} kali",
-        }
-        top_sorted = sorted(feature_importances.items(), key=lambda x: x[1], reverse=True)
-        for feat_name, _ in top_sorted:
-            val = features.get(feat_name, 0.0)
-            tpl = sentence_templates.get(feat_name, "{feat_name}: {v}")
-            candidate = tpl.format(v=int(val), feat_name=feat_name)
-            if candidate not in factors:
-                factors.append(candidate)
-            if len(factors) >= 3:
+    for feat_name, _ in sorted_features:
+        if feat_name in features:
+            val = features[feat_name]
+            tpl = sentence_templates.get(feat_name, f"{feat_name}: {{v}}")
+            factors.append(tpl.format(v=int(val)))
+            if len(factors) >= max_factors:
                 break
+    return factors
 
     return factors[:4]
 

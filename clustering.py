@@ -175,5 +175,64 @@ def run_clustering(
     }
 
 
+def run_kmeans_8features(
+    input_csv: str = "data_clustering_inverse.csv",
+    out_dir: Path | None = None,
+    random_state: int = 42,
+) -> Dict[str, Any]:
+    """Runs KMeans (k=3) on the 8 backend features only and maps clusters to Use Case 3 definitions.
+    
+    Cluster profiles (StandardScaler, random_state=42, n_init='auto'):
+    - Cluster 1: Attendance 2.64 (highest), Last visit 2.63d (most recent) -> Active (0)
+    - Cluster 0: Attendance 0.57 (lowest), Last visit 8.90d (longest absence) -> At Risk (1)
+    - Cluster 2: Attendance 1.49, Remaining sessions 10.60, Expiry 35.53d -> Need Attention (2)
+    """
+    base_dir = Path(__file__).resolve().parent
+    output_dir = out_dir or (base_dir / "data")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    csv_path = find_data_file(input_csv)
+    df = pd.read_csv(csv_path)
+
+    feature_cols = [
+        "attendance_frequency_7d",
+        "missed_session_count_7d",
+        "reschedule_frequency_7d",
+        "remaining_package_sessions",
+        "days_until_package_expiry",
+        "days_since_last_visit",
+        "reminder_count_7d",
+        "reminder_response_count_7d",
+    ]
+
+    scaler = StandardScaler()
+    scaled_feats = scaler.fit_transform(df[feature_cols])
+
+    km = KMeans(n_clusters=3, random_state=random_state, n_init="auto")
+    raw_clusters = km.fit_predict(scaled_feats)
+    sil_score = float(silhouette_score(scaled_feats, raw_clusters))
+
+    cluster_to_name = {1: "Active", 0: "At Risk", 2: "Need Attention"}
+    cluster_to_code = {1: 0, 0: 1, 2: 2}
+
+    output_df = df.copy()
+    output_df["label_lama"] = df["Nama_Segmen"]
+    output_df["target_lama"] = df["Target"]
+    output_df["Target"] = [cluster_to_code[c] for c in raw_clusters]
+    output_df["Nama_Segmen"] = [cluster_to_name[c] for c in raw_clusters]
+
+    out_csv = output_dir / "data_clustering_kmeans8.csv"
+    output_df.to_csv(out_csv, index=False)
+    print(f"[Clustering 8-Features] Saved: {out_csv}")
+    print(f"[Clustering 8-Features] Silhouette score: {sil_score:.4f}")
+
+    return {
+        "silhouette_score": sil_score,
+        "csv_path": str(out_csv),
+        "distribution": output_df["Nama_Segmen"].value_counts().to_dict(),
+    }
+
+
 if __name__ == "__main__":
     run_clustering()
+    run_kmeans_8features()

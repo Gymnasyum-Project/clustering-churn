@@ -1,0 +1,144 @@
+{
+  "model_name": "RandomForestClassifier",
+  "model_file": "random_forest_8fitur_v2.joblib",
+  "scikit_learn_version": "1.9.1",
+  "trained_at_utc": "2026-11-18T11:15:42.302861+00:00",
+  "random_state": 42,
+  "features": {
+    "count": 8,
+    "order": [
+      "attendance_frequency_7d",
+      "missed_session_count_7d",
+      "reschedule_frequency_7d",
+      "remaining_package_sessions",
+      "days_until_package_expiry",
+      "days_since_last_visit",
+      "reminder_count_7d",
+      "reminder_response_count_7d"
+    ],
+    "importances": {
+      "attendance_frequency_7d": 0.4546,
+      "days_since_last_visit": 0.2847,
+      "days_until_package_expiry": 0.0745,
+      "missed_session_count_7d": 0.0708,
+      "remaining_package_sessions": 0.0607,
+      "reminder_count_7d": 0.04,
+      "reminder_response_count_7d": 0.0093,
+      "reschedule_frequency_7d": 0.0053
+    }
+  },
+  "label_mapping": {
+    "0": "Active",
+    "1": "At Risk",
+    "2": "Need Attention"
+  },
+  "dataset": {
+    "total_rows": 6229,
+    "train_rows": 4360,
+    "test_rows": 1869,
+    "test_size": 0.3
+  },
+  "evaluation": {
+    "random_forest": {
+      "test_accuracy": 1.0,
+      "cv_5fold": {
+        "scores": [
+          0.9992,
+          1.0,
+          1.0,
+          1.0,
+          0.9992
+        ],
+        "mean": 0.9997,
+        "std": 0.0004
+      },
+      "classification_report": {
+        "Active": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 725.0
+        },
+        "At Risk": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 664.0
+        },
+        "Need Attention": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 480.0
+        },
+        "accuracy": 1.0,
+        "macro avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 1869.0
+        },
+        "weighted avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 1869.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          725,
+          0,
+          0
+        ],
+        [
+          0,
+          664,
+          0
+        ],
+        [
+          0,
+          0,
+          480
+        ]
+      ]
+    },
+    "decision_tree": {
+      "test_accuracy": 1.0,
+      "classification_report": {
+        "Active": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 725.0
+        },
+        "At Risk": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 664.0
+        },
+        "Need Attention": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 480.0
+        },
+        "accuracy": 1.0,
+        "macro avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 1869.0
+        },
+        "weighted avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 1869.0
+        }
+      }
+    }
+  },
+  "methodology_limitation_warning": "Target labels originate from unsupervised K-Means clustering on the same dataset. Classifier metrics reflect boundary learning fidelity of K-Means partitions rather than empirically observed ground-truth customer churn."
+}

@@ -12,7 +12,7 @@ client = TestClient(app)
 
 @pytest.fixture(scope="module")
 def valid_cust1_payload():
-    """Benchmark sample matching CUST00001 (Need Attention)."""
+    """Benchmark sample matching CUST00001 (Need Attention under v3 learned model)."""
     return {
         "customer_id": "CUST00001",
         "attendance_frequency_7d": 0.0,
@@ -28,23 +28,7 @@ def valid_cust1_payload():
 
 @pytest.fixture(scope="module")
 def valid_at_risk_payload():
-    """Benchmark sample matching CUST00009 from dataset (At Risk)."""
-    return {
-        "customer_id": "CUST00009",
-        "attendance_frequency_7d": 4.0,
-        "missed_session_count_7d": 0.0,
-        "reschedule_frequency_7d": 1.0,
-        "remaining_package_sessions": 9.0,
-        "days_until_package_expiry": 36.0,
-        "days_since_last_visit": 2.0,
-        "reminder_count_7d": 0.0,
-        "reminder_response_count_7d": 0.0,
-    }
-
-
-@pytest.fixture(scope="module")
-def valid_active_payload():
-    """Benchmark sample matching CUST00005 from dataset (Active)."""
+    """Benchmark sample matching CUST00005 (At Risk under v3 learned model: 0 visits in 7d, 7d absent, 1 missed, 2 reschedules)."""
     return {
         "customer_id": "CUST00005",
         "attendance_frequency_7d": 0.0,
@@ -54,6 +38,22 @@ def valid_active_payload():
         "days_until_package_expiry": 23.0,
         "days_since_last_visit": 7.0,
         "reminder_count_7d": 1.0,
+        "reminder_response_count_7d": 0.0,
+    }
+
+
+@pytest.fixture(scope="module")
+def valid_active_payload():
+    """Benchmark sample matching CUST00007 (Active under v3 learned model: 2 visits in 7d, 0d absence)."""
+    return {
+        "customer_id": "CUST00007",
+        "attendance_frequency_7d": 2.0,
+        "missed_session_count_7d": 0.0,
+        "reschedule_frequency_7d": 1.0,
+        "remaining_package_sessions": 6.0,
+        "days_until_package_expiry": 21.0,
+        "days_since_last_visit": 0.0,
+        "reminder_count_7d": 0.0,
         "reminder_response_count_7d": 0.0,
     }
 
