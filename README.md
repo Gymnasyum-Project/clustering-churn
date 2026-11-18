@@ -24,27 +24,6 @@ The original Colab notebook (`Klasifikasi.ipynb`) was trained on 13 features. Ho
 7. `reminder_count_7d` (WhatsApp/Notification reminders sent)
 8. `reminder_response_count_7d` (Reminders responded to by member)
 
-### v3 — K-Means 8-Fitur Murni (Method 2a, Tanpa Aturan Manual — Default Produksi)
-Menjawab instruksi Isco agar model mempelajari pola secara otomatis (*unsupervised learning*) langsung dari data tanpa aturan manual (*no hard-coding*):
-- Dilakukan klastering ulang K-Means ($k=3$, `StandardScaler`, `random_state=42`, `n_init='auto'`) **hanya pada 8 fitur backend**.
-- *Silhouette Score*: **0.1963** (klaster terbentuk murni secara matematis dari data).
-- Profil klaster yang muncul secara alami:
-  - **Active** (Klaster 1, 43.22%): Kehadiran tertinggi (rata-rata 2.64 sesi/7 hari), kunjungan paling baru (rata-rata 2.63 hari lalu), sesi terlewat terendah (0.12 sesi).
-  - **At Risk** (Klaster 0, 29.78%): Kehadiran terendah (rata-rata 0.57 sesi/7 hari), absensi terlama (rata-rata 8.90 hari), sesi terlewat tertinggi (0.99 sesi), notifikasi pengingat terbanyak (1.47 pesan).
-  - **Need Attention** (Klaster 2, 27.00%): Kehadiran moderat (rata-rata 1.49 sesi/7 hari), absensi moderat (rata-rata 4.26 hari), sisa sesi paket terbanyak (10.60 sesi), masa aktif paket terpanjang (35.53 hari).
-- Model Random Forest v3 dilatih murni dari label klaster ini:
-  - Akurasi Uji: **97.32%** (realistis, bukan 100% artifisial).
-  - 5-Fold Cross Validation: **97.11% (±0.52%)**.
-- Disimpan di `models/random_forest_8fitur_v3.joblib` dan `models/model_meta_v3.json`.
-
-### v2 — Rule-Based Labels (Method 2b, Ditolak/Diarsipkan, Hanya untuk Perbandingan)
-Eksperimen aturan manual berbasis kuantil persentil (menghasilkan akurasi 100.00% artifisial karena menduplikasi aturan yang ditulis tangan). Metode ini ditolak dan diarsipkan di `data/data_clustering_corrected.csv` dan `models/random_forest_8fitur_v2.joblib` hanya sebagai catatan perbandingan.
-
-### v1 — Model Awal Notebook (Inverted Clusters)
-Model acuan awal dari notebook yang tersimpan di `models/random_forest_8fitur.joblib` (akurasi 76.14%), di mana nama klaster terpasang terbalik.
-
----
-
 ## 2. Directory Structure
 
 ```
